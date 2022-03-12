@@ -3,6 +3,7 @@ import { Namespace, createNamespace } from 'continuation-local-storage';
 import cors from 'cors';
 import { ErrorHandler } from 'express-handler-errors';
 import morgan from 'morgan-body'
+import reqId from 'express-request-id';
 import routes from './routes';
 import logger from './middlewares/Logger';
 import 'reflect-metadata';
@@ -25,7 +26,7 @@ class App {
     this.express.use(express.json());
     this.express.use(cors());
 
-    const reqId = require('express-request-id');
+    // const reqId = require('express-request-id');
 
     this.express.use(reqId());
     this.express.use((req: Request, _: Response, next: NextFunction) => {
@@ -39,7 +40,10 @@ class App {
       prettify: false,
       logReqUserAgent: false,
       stream: {
-        write: (msg: string) => logger.log(msg),
+        write(msg: string) {
+          logger.log(msg)
+          return true;
+        },
       },
     });
   }
